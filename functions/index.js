@@ -11,30 +11,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-'use strict';
+"use strict";
 
-const { DialogflowApp } = require('actions-on-google');
-const functions = require('firebase-functions');
-const { sprintf } = require('sprintf-js');
+const { DialogflowApp } = require("actions-on-google");
+const functions = require("firebase-functions");
+const { sprintf } = require("sprintf-js");
 
-const strings = require('./strings');
+const strings = require("./strings");
 
-process.env.DEBUG = 'actions-on-google:*';
+process.env.DEBUG = "actions-on-google:*";
 
 /** Dialogflow Actions {@link https://dialogflow.com/docs/actions-and-parameters#actions} */
 const Actions = {
-  UNRECOGNIZED_DEEP_LINK: 'deeplink.unknown',
-  TELL_FACT: 'tell.fact',
-  TELL_CAT_FACT: 'tell.cat.fact'
+  UNRECOGNIZED_DEEP_LINK: "deeplink.unknown",
+  TELL_FACT: "tell.fact",
+  TELL_CAT_FACT: "tell.cat.fact"
 };
 /** Dialogflow Parameters {@link https://dialogflow.com/docs/actions-and-parameters#parameters} */
 const Parameters = {
-  CATEGORY: 'category'
+  CATEGORY: "category"
 };
 /** Dialogflow Contexts {@link https://dialogflow.com/docs/contexts} */
 const Contexts = {
-  FACTS: 'choose_fact-followup',
-  CATS: 'choose_cats-followup'
+  FACTS: "choose_fact-followup",
+  CATS: "choose_cats-followup"
 };
 /** Dialogflow Context Lifespans {@link https://dialogflow.com/docs/contexts#lifespan} */
 const Lifespans = {
@@ -60,7 +60,7 @@ const getRandomFact = facts => {
 };
 
 /** @param {Array<string>} messages The messages to concat */
-const concat = messages => messages.map(message => message.trim()).join(' ');
+const concat = messages => messages.map(message => message.trim()).join(" ");
 
 // Polyfill Object.values to get the values of the keys of an object
 if (!Object.values) {
@@ -84,7 +84,8 @@ const unhandledDeepLinks = app => {
     return app.ask(response, strings.general.noInputs);
   }
   const suggestions = strings.categories.map(category => category.suggestion);
-  const richResponse = app.buildRichResponse()
+  const richResponse = app
+    .buildRichResponse()
     .addSimpleResponse(response)
     .addSuggestions(suggestions);
 
@@ -164,8 +165,7 @@ const tellFact = app => {
   if (!category) {
     /** @type {string} */
     const action = app.getIntent();
-    console.error(`${parameter} parameter is unrecognized or ` +
-      `not provided by Dialogflow ${action} action`);
+    console.error(`${parameter} parameter is unrecognized or ` + `not provided by Dialogflow ${action} action`);
     return;
   }
   const fact = getRandomFact(facts[category.category]);
@@ -183,7 +183,8 @@ const tellFact = app => {
       // If cat facts not loaded or there still are cat facts left
       suggestions.push(strings.cats.suggestion);
     }
-    const richResponse = app.buildRichResponse()
+    const richResponse = app
+      .buildRichResponse()
       .addSimpleResponse(noFactsLeft(app, factCategory, otherCategory.category))
       .addSuggestions(suggestions);
 
@@ -195,11 +196,13 @@ const tellFact = app => {
   }
   const image = getRandomValue(strings.content.images);
   const [url, name] = image;
-  const card = app.buildBasicCard(fact)
+  const card = app
+    .buildBasicCard(fact)
     .addButton(strings.general.linkOut, strings.content.link)
     .setImage(url, name);
 
-  const richResponse = app.buildRichResponse()
+  const richResponse = app
+    .buildRichResponse()
     .addSimpleResponse(factPrefix)
     .addBasicCard(card)
     .addSimpleResponse(strings.general.nextFact)
@@ -230,7 +233,8 @@ const tellCatFact = app => {
     if (!screenOutput) {
       return app.ask(strings.transitions.cats.heardItAll, strings.general.noInputs);
     }
-    const richResponse = app.buildRichResponse()
+    const richResponse = app
+      .buildRichResponse()
       .addSimpleResponse(strings.transitions.cats.heardItAll, strings.general.noInputs)
       .addSuggestions(strings.general.suggestions.confirmation);
 
@@ -243,11 +247,13 @@ const tellCatFact = app => {
   }
   const image = getRandomValue(strings.cats.images);
   const [url, name] = image;
-  const card = app.buildBasicCard(fact)
+  const card = app
+    .buildBasicCard(fact)
     .setImage(url, name)
     .addButton(strings.general.linkOut, strings.cats.link);
 
-  const richResponse = app.buildRichResponse()
+  const richResponse = app
+    .buildRichResponse()
     .addSimpleResponse(`<speak>${factPrefix}</speak>`)
     .addBasicCard(card)
     .addSimpleResponse(strings.general.nextFact)
